@@ -1,6 +1,8 @@
 generator client {
+  interface            = "asyncio"
   provider             = "prisma-client-py"
   recursive_type_depth = 5
+  output = "prisma/client"
 }
 
 datasource db {
@@ -145,10 +147,10 @@ model Funding {
 }
 
 model APIToken {
-  id    String @id @default(cuid())
+  id String @id @default(cuid())
 
-  tokenGr String 
-  tokenCr String 
+  tokenGr String
+  tokenCr String
   tokenSm String
 
   name     String?
