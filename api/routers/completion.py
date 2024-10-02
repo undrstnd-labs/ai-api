@@ -4,7 +4,6 @@ from openai import OpenAI
 from starlette.responses import StreamingResponse
 from fastapi import APIRouter, HTTPException, Depends
 
-from api.database.models import APIToken
 from api.models.request import ChatCompletionRequest, CompletionRequest
 from api.services.api_key import retrieve_api_key, get_api_token_model_inference
 from api.services.async_generator import async_generator_chat_completion, async_generator_completion
@@ -20,7 +19,7 @@ router = APIRouter()
 )
 async def chat_completions(
     request: ChatCompletionRequest,
-    api_token: APIToken = Depends(retrieve_api_key)
+    api_token = Depends(retrieve_api_key)
 ):
     try:
         model, api_key, base_url = await get_api_token_model_inference(
@@ -83,7 +82,7 @@ async def chat_completions(
 )
 async def completions(
     request: CompletionRequest,
-    api_token: APIToken = Depends(retrieve_api_key)
+    api_token = Depends(retrieve_api_key)
 ):
     try:
         model, api_key, base_url = await get_api_token_model_inference(

@@ -3,8 +3,6 @@ from fastapi import HTTPException, Depends
 from fastapi.security.api_key import APIKeyHeader
 
 from api.database.db import Database
-from api.database.models import APIToken
-
 from api.models.type import Model
 from api.database.models import ModelService
 from api.models.inference import InferenceType, InferenceBaseUrl
@@ -14,7 +12,7 @@ async def retrieve_api_key(
     api_key_header: str = Depends(
         APIKeyHeader(name="Authorization", auto_error=False)
     )
-) -> APIToken:
+):
     """
     Retrieve the API token object from the database using the API key
     provided in the request header.
@@ -34,7 +32,7 @@ async def retrieve_api_key(
         )
     
     db = Database()
-    api_token = cast(APIToken, await db.get_api_key(api_key_header.split(" ")[1]))
+    api_token = await db.get_api_key(api_key_header.split(" ")[1])
 
     if api_token is None:
         print(f"Invalid API key: {api_key_header}")
@@ -48,7 +46,7 @@ async def retrieve_api_key(
 
 
 async def get_api_token_model_inference(
-            api_key: APIToken,
+            api_key,
             model: str
         ) -> Tuple[Model, str, str]:
     """
