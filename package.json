@@ -6,10 +6,10 @@
     "api-dev": "pip3 install -r requirements.txt && prisma generate && python3 -m uvicorn api.index:app --reload",
     "next-dev": "next dev",
     "dev": "concurrently \"npm run next-dev\" \"npm run api-dev\"",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && next build && prisma generate",
     "start": "next start",
     "lint": "next lint",
-    "install": "pip3 install -r requirements.txt",
+    "install": "pip3 install -r requirements.txt && prisma generate ",
     "postinstall": "prisma generate",
     "preview": "next build && next start",
     "test:comp": "python3 test/test_compilation.py"
