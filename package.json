@@ -3,16 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "api-dev": "pip3 install -r requirements.txt && prisma generate && python3 -m uvicorn api.index:app --reload",
+    "api-dev": "pip3 install -r requirements.txt && python3 -m uvicorn api.index:app --reload",
     "next-dev": "next dev",
     "dev": "concurrently \"npm run next-dev\" \"npm run api-dev\"",
-    "build": "prisma generate && next build && prisma generate",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "install": "pip3 install -r requirements.txt && prisma generate",
-    "postinstall": "prisma generate",
+    "install": "pip3 install -r requirements.txt",
     "preview": "next build && next start",
-    "test:comp": "python3 test/test_compilation.py"
+    "test:comp": "python3 tests/test_compilation.py"
   },
   "dependencies": {
     "@types/node": "22.5.5",

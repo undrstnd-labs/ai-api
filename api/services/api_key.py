@@ -2,10 +2,10 @@ from typing import cast, Tuple
 from fastapi import HTTPException, Depends
 from fastapi.security.api_key import APIKeyHeader
 
-from prisma.client import APIToken
+from api.database.db import Database
+from api.database.models import APIToken
 
 from api.models.type import Model
-from api.database.db import Database
 from api.services.model import ModelService
 from api.models.inference import InferenceType, InferenceBaseUrl
 
@@ -33,8 +33,8 @@ async def retrieve_api_key(
             detail="ERROR: API key is missing"
         )
     
-    async with Database() as db:
-        api_token = cast(APIToken, await db.get_api_key(api_key_header.split(" ")[1]))
+    db = Database()
+    api_token = cast(APIToken, await db.get_api_key(api_key_header.split(" ")[1]))
 
     if api_token is None:
         print(f"Invalid API key: {api_key_header}")
@@ -62,7 +62,6 @@ async def get_api_token_model_inference(
     :return: A tuple containing the model object, inference type, and token.
     :rtype: Tuple[Model, InferenceType, str]
     """
-
     model_service = ModelService()
     if model_service.get_model(model) is None:
         print(f"Model not found: {model}")
@@ -73,21 +72,21 @@ async def get_api_token_model_inference(
     if model_service.get_model_inference(model) == InferenceType.GR_LPU.value:
         return (
             model_service.get_model_id(model),
-            api_key.tokenGr,
+            api_key["tokenGr"],
             InferenceBaseUrl.GR_LPU.value
         )
 
     elif (model_service.get_model_inference(model) == InferenceType.CR_INF.value):
         return (
                 model_service.get_model_id(model),
-                api_key.tokenCr,
+                api_key["tokenCr"],
                 InferenceBaseUrl.CR_INF.value
             )
 
     elif (model_service.get_model_inference(model) == InferenceType.SM_RDU.value):
         return (
                 model_service.get_model_id(model),
-                api_key.tokenSm,
+                api_key["tokenSm"],
                 InferenceBaseUrl.SM_RDU.value
             )
 

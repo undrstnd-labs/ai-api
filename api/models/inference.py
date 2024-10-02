@@ -12,6 +12,6 @@ class InferenceType(Enum):
 
 
 class InferenceBaseUrl(Enum):
-    GR_LPU = os.getenv("GR_LPU_ENDPOINT")
-    CR_INF = os.getenv("CR_INF_ENDPOINT")
-    SM_RDU = os.getenv("SM_RDU_ENDPOINT")
+    GR_LPU = os.environ.get("GR_LPU_ENDPOINT")
+    CR_INF = os.environ.get("CR_INF_ENDPOINT")
+    SM_RDU = os.environ.get("SM_RDU_ENDPOINT")
