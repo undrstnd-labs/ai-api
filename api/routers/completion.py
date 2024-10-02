@@ -1,6 +1,6 @@
 import logging
 from openai import OpenAI
-from prisma.models import APIToken
+from prisma.client import APIToken
 from starlette.responses import StreamingResponse
 from fastapi import APIRouter, HTTPException, Depends
 from api.models.request import ChatCompletionRequest, CompletionRequest

@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Any
 from prisma import Prisma
-from prisma.models import Funding, APIToken, Request, Usage, Resource
+from prisma.client import Funding, APIToken, Request, Usage, Resource
 
 
 class Database:

@@ -2,7 +2,7 @@ from typing import cast, Tuple
 from fastapi import HTTPException, Depends
 from fastapi.security.api_key import APIKeyHeader
 
-from prisma.models import APIToken
+from prisma.client import APIToken
 
 from api.models.type import Model
 from api.database.db import Database
