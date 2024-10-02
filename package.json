@@ -10,7 +10,7 @@
     "start": "next start",
     "lint": "next lint",
     "install": "pip3 install -r requirements.txt",
-    "prepare": "pip3 install -r requirements.txt && prisma generate",
+    "postinstall": "prisma generate",
     "preview": "next build && next start",
     "test:comp": "python3 test/test_compilation.py"
   },
