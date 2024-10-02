@@ -12,7 +12,3 @@ app = FastAPI(
 
 app.include_router(health.router)
 app.include_router(completion.router)
-
-@app.get("/api/py/helloFastApi")
-def hello_fast_api():
-    return {"message": "Hello from FastAPI"}

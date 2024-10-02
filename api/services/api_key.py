@@ -6,7 +6,7 @@ from api.database.db import Database
 from api.database.models import APIToken
 
 from api.models.type import Model
-from api.services.model import ModelService
+from api.database.models import ModelService
 from api.models.inference import InferenceType, InferenceBaseUrl
 
 
