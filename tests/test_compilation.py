@@ -10,11 +10,11 @@ def main():
 
     base_url = production_url if os.environ.get("ENV") == "production" else development_url
 
-    is_streaming = True
+    is_streaming = False
 
     client = OpenAI(
         api_key="udsk_demo-api-key-x-00000",
-        base_url=base_url
+        base_url="https://undrstnd-api.vercel.app/v1"
     )
 
     chat_completion = client.chat.completions.create(
