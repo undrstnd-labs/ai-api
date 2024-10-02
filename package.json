@@ -1,14 +1,18 @@
 {
-  "name": "nextjs-fastapi",
-  "version": "0.2.0",
+  "name": "@undrstnd/ai-api",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "fastapi-dev": "pip3 install -r requirements.txt && python3 -m uvicorn api.index:app --reload",
+    "api-dev": "pip3 install -r requirements.txt && prisma generate && python3 -m uvicorn api.index:app --reload",
     "next-dev": "next dev",
-    "dev": "concurrently \"npm run next-dev\" \"npm run fastapi-dev\"",
+    "dev": "concurrently \"npm run next-dev\" \"npm run api-dev\"",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "install": "pip3 install -r requirements.txt",
+    "prepare": "pip3 install -r requirements.txt && prisma generate",
+    "preview": "next build && next start",
+    "test:comp": "python3 test/test_compilation.py"
   },
   "dependencies": {
     "@types/node": "22.5.5",
