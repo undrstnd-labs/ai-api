@@ -5,16 +5,17 @@ from dotenv import load_dotenv
 def main():
     load_dotenv()
 
-    production_url = "https://api.undrstnd-labs.com/v1"
+    production_url = "https://ai-api-o4rf.onrender.com/v1"
     development_url = "http://localhost:3000/v1"
+    fastapi_url = "http://127.0.0.1:8000/v1"
 
-    base_url = production_url if os.environ.get("ENV") == "production" else development_url
+    base_url = production_url if os.environ.get("ENV") == "production" else fastapi_url
 
     is_streaming = True
 
     client = OpenAI(
         api_key="udsk_demo-api-key-x-00000",
-        base_url=base_url
+        base_url=production_url
     )
 
     chat_completion = client.chat.completions.create(
