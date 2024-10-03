@@ -1,4 +1,4 @@
-fastapi==0.115.0
+fastapi[all]
 uvicorn[standard]==0.30.6
 openai==1.34.0
 tinydb==4.8.0
