@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 from openai import OpenAI
 
 from starlette.responses import StreamingResponse
@@ -18,7 +19,7 @@ router = APIRouter()
     dependencies=[Depends(retrieve_api_key)]
 )
 async def chat_completions(
-    request: ChatCompletionRequest,
+    request: Union[ChatCompletionRequest, CompletionRequest],
     api_token = Depends(retrieve_api_key)
 ):
     try:
@@ -34,17 +35,7 @@ async def chat_completions(
                     async_generator_chat_completion(
                         model=model,
                         client=client,
-                        messages=request.messages,
-                        max_tokens=request.max_tokens,
-                        temperature=request.temperature,
-                        top_p=request.top_p,
-                        frequency_penalty=request.frequency_penalty,
-                        presence_penalty=request.presence_penalty,
-                        stop=request.stop,
-                        n=request.n,
-                        logprobs=request.logprobs,
-                        user=request.user,
-                        system=request.system,
+                        request=request
                     ), media_type="application/x-ndjson"
                 )
             else:
@@ -66,52 +57,17 @@ async def chat_completions(
                     stream=False,
                 )
                 return response
-        else:
-            return HTTPException(
-                status_code=400, 
-                detail="ERROR: No messages provided"
-            )
-    except Exception as e:
-        logger.error(f"Error in chat_completions: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
-@router.post(
-    "/v1/completions",
-    dependencies=[Depends(retrieve_api_key)]
-)
-async def completions(
-    request: CompletionRequest,
-    api_token = Depends(retrieve_api_key)
-):
-    try:
-        model, api_key, base_url = await get_api_token_model_inference(
-            api_token, request.model
-        )
-
-        client = OpenAI(api_key, base_url)
-
-        if request.prompt:
+        elif request.prompt:
             if request.stream:
                 return StreamingResponse(
                     async_generator_completion(
                         model=model,
                         client=client,
-                        system=request.system,
-                        prompt=request.prompt,
-                        max_tokens=request.max_tokens,
-                        temperature=request.temperature,
-                        top_p=request.top_p,
-                        frequency_penalty=request.frequency_penalty,
-                        presence_penalty=request.presence_penalty,
-                        stop=request.stop,
-                        n=request.n,
-                        logprobs=request.logprobs,
-                        user=request.user
+                        request=request
                     ), media_type="application/x-ndjson"
                 )
             else:
-                response = client.completions.create(
+                response = client.chat.completions.create(
                     model=model,
                     prompt=request.prompt,
                     max_tokens=request.max_tokens,
@@ -122,13 +78,15 @@ async def completions(
                     stop=request.stop,
                     n=request.n,
                     logprobs=request.logprobs,
-                    echo=request.echo,
                     user=request.user,
                     stream=False,
                 )
                 return response
         else:
-            return HTTPException(status_code=400, detail="ERROR: No prompt provided")
+            return HTTPException(
+                status_code=400,
+                detail="ERROR: No messages or prompt provided"
+            )
     except Exception as e:
-        logger.error(f"Error in completions: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        logger.error(f"Error in chat_completions: {e}")
+        raise HTTPException(status_code=500, detail="ERROR: Internal server error")

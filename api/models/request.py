@@ -8,34 +8,30 @@ class Message(BaseModel):
 
 
 class ChatCompletionRequest(BaseModel):
-    model: str = "llama3-8b-8192"
-    messages: List[Message] = None
-    system: Optional[str] = None
-    max_tokens: Optional[int] = 512
-    temperature: Optional[float] = 0.1
+    model: str
+    messages: List[Message]
     stream: Optional[bool] = False
-    top_p: Optional[float] = 1.0
-    frequency_penalty: Optional[float] = 0.0
-    presence_penalty: Optional[float] = 0.0
+    max_tokens: Optional[int] = None
+    temperature: Optional[float] = None
+    top_p: Optional[float] = None
+    frequency_penalty: Optional[float] = None
+    presence_penalty: Optional[float] = None
     stop: Optional[Union[str, List[str]]] = None
-    n: Optional[int] = 1
-    logprobs: Optional[int] = None
-    echo: Optional[bool] = False
+    n: Optional[int] = None
+    logprobs: Optional[bool] = None
     user: Optional[str] = None
 
 
 class CompletionRequest(BaseModel):
-    model: str = "llama3-8b-8192"
-    prompt: str = None
-    system: Optional[str] = None
-    max_tokens: Optional[int] = 512
-    temperature: Optional[float] = 0.1
+    model: str
+    prompt: str
     stream: Optional[bool] = False
-    top_p: Optional[float] = 1.0
-    frequency_penalty: Optional[float] = 0.0
-    presence_penalty: Optional[float] = 0.0
+    max_tokens: Optional[int] = None
+    temperature: Optional[float] = None
+    top_p: Optional[float] = None
+    frequency_penalty: Optional[float] = None
+    presence_penalty: Optional[float] = None
     stop: Optional[Union[str, List[str]]] = None
-    n: Optional[int] = 1
-    logprobs: Optional[int] = None
-    echo: Optional[bool] = False
+    n: Optional[int] = None
+    logprobs: Optional[bool] = None
     user: Optional[str] = None

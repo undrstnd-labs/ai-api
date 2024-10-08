@@ -5,12 +5,12 @@ from dotenv import load_dotenv
 def main():
     load_dotenv()
 
-    development_url = "http://localhost:3000/v1"
+    development_url = "http://localhost:8000/v1"
     production_url = "https://api.undrstnd-labs.com/v1"
 
     base_url = production_url if os.environ.get("ENV") == "production" else development_url
 
-    is_streaming = False
+    is_streaming = True
 
     client = OpenAI(
         api_key="udsk_demo-api-key-x-00000",
@@ -32,13 +32,14 @@ def main():
 
     if not is_streaming:
         print(chat_completion.choices[0].message.content)
+        print("\n")
+        print(chat_completion.to_dict()['usage'])   
+
 
     if is_streaming:
         for chunk in chat_completion:
             print(chunk.choices[0].delta.content, end="", flush=True)
 
-    print("\n")
-    print(chat_completion.to_dict()['usage'])
-
+   
 if __name__ == "__main__":
     main()
