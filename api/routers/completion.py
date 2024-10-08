@@ -1,5 +1,4 @@
 import logging
-from typing import Union
 from openai import OpenAI
 
 from starlette.responses import StreamingResponse
@@ -19,7 +18,7 @@ router = APIRouter()
     dependencies=[Depends(retrieve_api_key)]
 )
 async def chat_completions(
-    request: Union[ChatCompletionRequest, CompletionRequest],
+    request: ChatCompletionRequest,
     api_token = Depends(retrieve_api_key)
 ):
     try:
@@ -57,7 +56,32 @@ async def chat_completions(
                     stream=False,
                 )
                 return response
-        elif request.prompt:
+        else:
+            return HTTPException(
+                status_code=400,
+                detail="ERROR: No messages provided"
+            )
+    except Exception as e:
+        logger.error(f"Error in chat_completions: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.post(
+    "/v1/completions",
+    dependencies=[Depends(retrieve_api_key)]
+)
+async def completions(
+    request: CompletionRequest,
+    api_token = Depends(retrieve_api_key)
+):
+    try:
+        model, api_key, base_url = await get_api_token_model_inference(
+            api_token, request.model
+        )
+        
+        client = OpenAI(api_key=api_key, base_url=base_url)
+
+        if request.prompt:
             if request.stream:
                 return StreamingResponse(
                     async_generator_completion(
@@ -67,9 +91,13 @@ async def chat_completions(
                     ), media_type="application/x-ndjson"
                 )
             else:
-                response = client.chat.completions.create(
+                response = client.completions.create(
                     model=model,
-                    prompt=request.prompt,
+                    messages=[
+                            {"role": "system", "content": request.system},
+                            {"role": m.role, "content": m.content}
+                            for m in request.messages
+                        ],
                     max_tokens=request.max_tokens,
                     temperature=request.temperature,
                     top_p=request.top_p,
@@ -83,10 +111,8 @@ async def chat_completions(
                 )
                 return response
         else:
-            return HTTPException(
-                status_code=400,
-                detail="ERROR: No messages or prompt provided"
-            )
+            return HTTPException(status_code=400, detail="ERROR: No prompt provided")
     except Exception as e:
-        logger.error(f"Error in chat_completions: {e}")
-        raise HTTPException(status_code=500, detail="ERROR: Internal server error")
+        logger.error(f"Error in completions: {e}")
+        print(e)
+        raise HTTPException(status_code=500, detail="Internal server error")

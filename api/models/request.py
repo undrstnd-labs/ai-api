@@ -24,7 +24,7 @@ class ChatCompletionRequest(BaseModel):
 
 class CompletionRequest(BaseModel):
     model: str
-    prompt: str
+    system: Optional[str] = None
     stream: Optional[bool] = False
     max_tokens: Optional[int] = None
     temperature: Optional[float] = None
