@@ -4,23 +4,24 @@ from openai import OpenAI
 from starlette.responses import StreamingResponse
 from fastapi import APIRouter, HTTPException, Depends
 
-from api.models.request import ChatCompletionRequest, CompletionRequest
+from api.models.request import ChatRequestRAG, CompletionRequestRAG
 from api.services.api_key import retrieve_api_key, get_api_token_model_inference
 from api.services.async_generator import async_generator_chat_completion, async_generator_completion
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger( )
 
 router = APIRouter()
 
 
 @router.post(
-    "/v1/chat/completions",
+    "/v1/rag/chat/completions",
     dependencies=[Depends(retrieve_api_key)]
 )
-async def chat_completions(
-    request: ChatCompletionRequest,
+async def rag_chat_completions(
+    request: ChatRequestRAG,
     api_token = Depends(retrieve_api_key)
 ):
+    print(request)
     try:
         model, api_key, base_url = await get_api_token_model_inference(
             api_token, request.model
@@ -40,9 +41,8 @@ async def chat_completions(
             else:
                 response = client.chat.completions.create(
                     model=model,
-                    messages=[
-                        {"role": m.role, "content": m.content}
-                        for m in request.messages
+                     messages=[
+                        *[{"role": m.role, "content": m.content} for m in request.messages]
                     ],
                     max_tokens=request.max_tokens,
                     temperature=request.temperature,
@@ -67,11 +67,11 @@ async def chat_completions(
 
 
 @router.post(
-    "/v1/completions",
+    "/v1/rag/completions",
     dependencies=[Depends(retrieve_api_key)]
 )
-async def completions(
-    request: CompletionRequest,
+async def rag_completions(
+    request: CompletionRequestRAG,
     api_token = Depends(retrieve_api_key)
 ):
     try:
@@ -93,8 +93,7 @@ async def completions(
             else:
                 response = client.completions.create(
                     model=model,
-                     messages=[
-                        {"role": "system", "content": request.prompt},
+                    messages=[
                         *[{"role": m.role, "content": m.content} for m in request.messages]
                     ],
                     max_tokens=request.max_tokens,

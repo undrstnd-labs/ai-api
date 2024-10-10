@@ -24,7 +24,39 @@ class ChatCompletionRequest(BaseModel):
 
 class CompletionRequest(BaseModel):
     model: str
-    system: Optional[str] = None
+    prompt: str
+    stream: Optional[bool] = False
+    max_tokens: Optional[int] = None
+    temperature: Optional[float] = None
+    top_p: Optional[float] = None
+    frequency_penalty: Optional[float] = None
+    presence_penalty: Optional[float] = None
+    stop: Optional[Union[str, List[str]]] = None
+    n: Optional[int] = None
+    logprobs: Optional[bool] = None
+    user: Optional[str] = None
+
+class ChatRequestRAG(BaseModel):
+    model: str
+    messages: List[Message]
+    dataSourceToken: str
+    similarityLength: Optional[int] = 5
+    stream: Optional[bool] = False
+    max_tokens: Optional[int] = None
+    temperature: Optional[float] = None
+    top_p: Optional[float] = None
+    frequency_penalty: Optional[float] = None
+    presence_penalty: Optional[float] = None
+    stop: Optional[Union[str, List[str]]] = None
+    n: Optional[int] = None
+    logprobs: Optional[bool] = None
+    user: Optional[str] = None
+
+class CompletionRequestRAG(BaseModel):
+    model: str
+    prompt: str
+    dataSourceToken: str
+    similarityLength: Optional[int] = 5
     stream: Optional[bool] = False
     max_tokens: Optional[int] = None
     temperature: Optional[float] = None

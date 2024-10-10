@@ -45,9 +45,8 @@ async def async_generator_completion(
         model=model,
         stream=True,
         messages=[
-            {"role": "system", "content": request.system},
-            {"role": m.role, "content": m.content}
-            for m in request.messages
+            {"role": "system", "content": request.prompt},
+            *[{"role": m.role, "content": m.content} for m in request.messages]
         ],
         max_tokens=request.max_tokens,
         temperature=request.temperature,

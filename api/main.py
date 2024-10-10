@@ -1,7 +1,6 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from config.site import version, title, description
-from api.routers import health, completion
+from api.routers import health, completion, rag
 
 app = FastAPI(
     title=title,
@@ -12,3 +11,4 @@ app = FastAPI(
 
 app.include_router(health.router)
 app.include_router(completion.router)
+app.include_router(rag.router)

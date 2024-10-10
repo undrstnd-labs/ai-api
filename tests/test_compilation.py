@@ -1,4 +1,4 @@
-import os
+import os, httpx
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -17,17 +17,15 @@ def main():
         base_url=base_url
     )
 
-    user_input = input("Enter a message: ")
+    user_input= input("Enter your message: ")
     chat_completion = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
         messages=[
-            {
-                "role": "user",
-                "content": user_input
-            }
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": user_input}
         ],
-        model="llama3-8b-8192",
-        stream=is_streaming,
-        max_tokens=1000,
+        max_tokens=600,
+        stream=is_streaming
     )
 
     if not is_streaming:
