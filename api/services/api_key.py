@@ -2,9 +2,9 @@ from typing import cast, Tuple
 from fastapi import HTTPException, Depends
 from fastapi.security.api_key import APIKeyHeader
 
-from api.database.db import Database
+from api.database.api_tokens import ApiTokens
 from api.models.type import Model
-from api.database.models import ModelService
+from api.services.models import ModelService
 from api.models.inference import InferenceType, InferenceBaseUrl
 
 
@@ -30,9 +30,8 @@ async def retrieve_api_key(
             status_code=403,
             detail="ERROR: API key is missing"
         )
-    
-    db = Database()
-    api_token = await db.get_api_key(api_key_header.split(" ")[1])
+    api_tokens = ApiTokens()
+    api_token = await api_tokens.get_api_key(api_key_header.split(" ")[1])
 
     if api_token is None:
         print(f"Invalid API key: {api_key_header}")

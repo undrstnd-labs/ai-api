@@ -50,7 +50,6 @@ The Python/FastAPI server is mapped under `/api/`. The project structure is orga
 └── run.sh
 ```
 
-
 ## Demo
 
 You can see the API in action by visiting our demo page at [Undrstnd AI API Demo](https://dev.undrstnd-labs.acompp/). The demo showcases the various endpoints and functionalities provided by the API.
@@ -60,29 +59,34 @@ You can see the API in action by visiting our demo page at [Undrstnd AI API Demo
 To develop locally, follow these steps:
 
 1. **Clone the repository:**
+
     ```sh
     git clone https://github.com/undrstnd-labs/ai-api.git
     cd undrstnd-ai-api
     ```
 
 2. **Set up a virtual environment:**
+
     ```sh
-    python -m venv venv
+    python3 -m venv venv
     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
     ```
 
 3. **Install dependencies:**
+
     ```sh
     pip install -r requirements.txt
     ```
 
 4. **Configure environment variables:**
     Copy `.env.example` to `.env` and update it with your configuration.
+
     ```sh
     cp .env.example .env
     ```
 
 5. **Run the server:**
+
     ```sh
     uvicorn api.main:app --reload
     ```
