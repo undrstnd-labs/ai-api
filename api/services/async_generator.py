@@ -1,22 +1,18 @@
-import json
 import asyncio
+import json
+
 from openai import OpenAI
 
 from api.models.request import ChatCompletionRequest, CompletionRequest
 
 
 async def async_generator_chat_completion(
-        client: OpenAI,
-        model: str,
-        request: ChatCompletionRequest
-        ):
+    client: OpenAI, model: str, request: ChatCompletionRequest
+):
     response = client.chat.completions.create(
         model=model,
         stream=True,
-        messages=[
-            {"role": m.role, "content": m.content}
-            for m in request.messages
-        ],
+        messages=[{"role": m.role, "content": m.content} for m in request.messages],
         max_tokens=request.max_tokens,
         temperature=request.temperature,
         top_p=request.top_p,
@@ -25,7 +21,7 @@ async def async_generator_chat_completion(
         stop=request.stop,
         n=request.n,
         logprobs=request.logprobs,
-        user=request.user
+        user=request.user,
     )
 
     for chunk in response:
@@ -35,18 +31,15 @@ async def async_generator_chat_completion(
     yield "data: [DONE]\n\n"
 
 
-
 async def async_generator_completion(
-        client: OpenAI,
-        model: str,
-        request: CompletionRequest
-        ):
+    client: OpenAI, model: str, request: CompletionRequest
+):
     response = client.completions.create(
         model=model,
         stream=True,
         messages=[
             {"role": "system", "content": request.prompt},
-            *[{"role": m.role, "content": m.content} for m in request.messages]
+            *[{"role": m.role, "content": m.content} for m in request.messages],
         ],
         max_tokens=request.max_tokens,
         temperature=request.temperature,
@@ -56,7 +49,7 @@ async def async_generator_completion(
         stop=request.stop,
         n=request.n,
         logprobs=request.logprobs,
-        user=request.user
+        user=request.user,
     )
 
     for chunk in response:

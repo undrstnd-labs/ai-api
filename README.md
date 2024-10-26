@@ -69,7 +69,8 @@ To develop locally, follow these steps:
 
     ```sh
     python3 -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    source venv/bin/activate  # On Unix or MacOS
+    .\venv\Scripts\activate  # On Windows
     ```
 
 3. **Install dependencies:**

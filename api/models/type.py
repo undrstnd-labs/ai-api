@@ -1,4 +1,5 @@
 from typing import List, Optional
+
 from pydantic import BaseModel
 
 
@@ -12,7 +13,7 @@ class Model(BaseModel):
     source: str
     tags: List[str]
     maxFileSize: Optional[int] = 4096
-    maxContextWindow: Optional[int] = 4096 
+    maxContextWindow: Optional[int] = 4096
     pricing: float
     inference: str
 

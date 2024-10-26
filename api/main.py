@@ -1,12 +1,14 @@
 from fastapi import FastAPI
-from config.site import version, title, description
-from api.routers import health, completion, rag
+
+from api.routers import completion, health, rag
+from config.site import description, title, version
 
 app = FastAPI(
     title=title,
     version=version,
     description=description,
-    docs_url="/api/py/docs", openapi_url="/api/py/openapi.json"
+    docs_url="/api/py/docs",
+    openapi_url="/api/py/openapi.json",
 )
 
 app.include_router(health.router)

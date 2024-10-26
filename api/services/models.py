@@ -1,22 +1,26 @@
 import enum
-import os, json
+import json
+import os
 from typing import List, Optional
 
 from api.models.type import Model
+
 
 class UserType(enum.Enum):
     ORGANIZATION = "ORGANIZATION"
     DEVELOPER = "DEVELOPER"
     ADMIN = "ADMIN"
 
+
 class RequestStatus(enum.Enum):
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
     PENDING = "PENDING"
 
+
 class ModelService:
     def __init__(self):
-        with open(os.path.join(os.getcwd(), "public/models.json"), 'r') as f:
+        with open(os.path.join(os.getcwd(), "public/models.json"), "r") as f:
             models_data = json.load(f)
         self.models = [Model(**model_data) for model_data in models_data]
 

@@ -1,6 +1,8 @@
 import os
+
 from dotenv import load_dotenv
 from supabase import create_client
+
 
 class SupabaseClient:
     def __init__(self):

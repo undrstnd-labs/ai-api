@@ -1,10 +1,12 @@
-from typing import List, Optional, Union, BinaryIO
+from typing import Any, BinaryIO, List, Optional, Union
+
 from pydantic import BaseModel
 
 
 class Message(BaseModel):
     role: str
     content: str
+
 
 class ChatCompletionRequest(BaseModel):
     model: str
@@ -35,6 +37,7 @@ class CompletionRequest(BaseModel):
     logprobs: Optional[bool] = None
     user: Optional[str] = None
 
+
 class ChatRequestRAG(BaseModel):
     model: str
     messages: List[Message]
@@ -50,6 +53,7 @@ class ChatRequestRAG(BaseModel):
     n: Optional[int] = None
     logprobs: Optional[bool] = None
     user: Optional[str] = None
+
 
 class CompletionRequestRAG(BaseModel):
     model: str
@@ -67,17 +71,18 @@ class CompletionRequestRAG(BaseModel):
     logprobs: Optional[bool] = None
     user: Optional[str] = None
 
+
 class AudioTranscriptions(BaseModel):
-    file: BinaryIO
+    file: Any
     model: str
-    language: Optional[str]
-    prompt: Optional[str]
-    response_format: Optional[str]
-    temperature: Optional[float]
-    timestamp_granularities: Optional[List[str]]
+    prompt: Optional[str] = None
+    response_format: Optional[str] = None
+    temperature: Optional[float] = None
+    language: Optional[str] = None
+
 
 class AudioTranslations(BaseModel):
-    file: BinaryIO
+    file: Any
     model: str
     prompt: Optional[str]
     response_format: Optional[str]
