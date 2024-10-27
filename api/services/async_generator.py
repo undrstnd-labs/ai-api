@@ -10,15 +10,15 @@ from api.models.request import ChatCompletionRequest, CompletionRequest
 from api.models.type import Model
 from api.services.models import ModelService
 
+usage_db = Usage()
+funding_db = Fundings()
+requests_db = Requests()
+model_service = ModelService()
+
 
 async def async_generator_chat_completion(
     client: OpenAI, model: Model, request: ChatCompletionRequest, api_token: dict
 ):
-    usage_db = Usage()
-    funding_db = Fundings()
-    requests_db = Requests()
-    model_service = ModelService()
-
     request_data = requests_db.create_request(
         user_id=api_token["userId"],
         parameters=request.model_dump(),
@@ -80,15 +80,25 @@ async def async_generator_chat_completion(
 
 
 async def async_generator_completion(
-    client: OpenAI, model: str, request: CompletionRequest
+    client: OpenAI, model: str, request: CompletionRequest, api_token: dict
 ):
+    usage_db = Usage()
+    funding_db = Fundings()
+    requests_db = Requests()
+    model_service = ModelService()
+
+    request_data = requests_db.create_request(
+        user_id=api_token["userId"],
+        parameters=request.model_dump(),
+        request=request.model_dump(),
+        response="PENDING: Request in progress.",
+        endpoint="/v1/completions",
+    )
+
     response = client.completions.create(
         model=model,
         stream=True,
-        messages=[
-            {"role": "system", "content": request.prompt},
-            *[{"role": m.role, "content": m.content} for m in request.messages],
-        ],
+        prompt=request.prompt,
         max_tokens=request.max_tokens,
         temperature=request.temperature,
         top_p=request.top_p,
@@ -100,8 +110,38 @@ async def async_generator_completion(
         user=request.user,
     )
 
+    token_used = 0
     for chunk in response:
         chunk_data = chunk.to_dict()
+        token_used += 1
         yield f"data: {json.dumps(chunk_data)}\n\n"
         await asyncio.sleep(0.01)
+
+    consumption = token_used * (model_service.get_model_pricing(model) / 1000000)
+    funding = funding_db.get_funding(user_id=api_token["userId"])
+    if not funding or funding["amount"] <= 0:
+        requests_db.update_request(
+            request_id=request_data.data[0]["id"],
+            status="FAILED",
+            response="ERROR: Insufficient balance.",
+        )
+        yield "data: [DONE]\n\n"
+        raise Exception("Insufficient balance.")
+    funding_db.update_funding(
+        user_id=api_token["userId"],
+        amount=funding["amount"] - consumption,
+        currency=funding["currency"],
+    )
+
+    usage_db.create_usage(
+        user_id=api_token["userId"],
+        tokens_used=token_used,
+        cost=consumption,
+    )
+
+    requests_db.update_request(
+        request_id=request_data.data[0]["id"],
+        status="SUCCESS",
+    )
+
     yield "data: [DONE]\n\n"
