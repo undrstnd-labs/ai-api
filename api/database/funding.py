@@ -7,22 +7,19 @@ class Fundings:
     def __init__(self):
         self.client = SupabaseClient().client
 
-    async def update_funding(
+    def update_funding(
         self, user_id: str, amount: float, currency: str
     ) -> Optional[dict]:
         funding = (
-            await self.client.table("fundings")
-            .update(
-                where={"userId": user_id}, data={"amount": amount, "currency": currency}
-            )
+            self.client.table("fundings")
+            .update({"amount": amount, "currency": currency})
+            .eq("userId", user_id)
             .execute()
         )
-        return funding
+        return funding.data[0] if funding.data else None
 
-    async def get_funding(self, user_id: str) -> Optional[dict]:
+    def get_funding(self, user_id: str) -> Optional[dict]:
         funding = (
-            await self.client.table("fundings")
-            .find_unique(where={"userId": user_id})
-            .execute()
+            self.client.table("fundings").select("*").eq("userId", user_id).execute()
         )
-        return funding
+        return funding.data[0] if funding.data else None

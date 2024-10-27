@@ -16,11 +16,6 @@ class Requests:
         response: str,
         endpoint: str,
     ) -> dict:
-        print("user_id", user_id)
-        print("parameters", parameters)
-        print("request", request)
-        print("response", response)
-        print("endpoint", endpoint)
         request = (
             self.client.table("requests")
             .insert(

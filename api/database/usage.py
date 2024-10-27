@@ -1,15 +1,17 @@
 from api.database.client import SupabaseClient
+from api.utils.uuid import generate_uuid
 
 
 class Usage:
     def __init__(self):
         self.client = SupabaseClient().client
 
-    async def create_usage(self, user_id: str, tokens_used: int, cost: float) -> dict:
+    def create_usage(self, user_id: str, tokens_used: int, cost: float) -> dict:
         usage = (
-            await self.client.table("usage")
-            .create(
-                data={
+            self.client.table("usages")
+            .insert(
+                {
+                    "id": generate_uuid(),
                     "userId": user_id,
                     "tokensUsed": tokens_used,
                     "cost": cost,
@@ -19,12 +21,11 @@ class Usage:
         )
         return usage
 
-    async def update_usage(self, usage_id: str, tokens_used: int, cost: float) -> dict:
+    def update_usage(self, usage_id: str, tokens_used: int, cost: float) -> dict:
         usage = (
-            await self.client.table("usage")
-            .update(
-                where={"id": usage_id}, data={"tokensUsed": tokens_used, "cost": cost}
-            )
+            self.client.table("usages")
+            .update({"tokensUsed": tokens_used, "cost": cost})
+            .eq("id", usage_id)
             .execute()
         )
         return usage

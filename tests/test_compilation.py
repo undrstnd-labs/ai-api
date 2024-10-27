@@ -23,7 +23,7 @@ def main():
         model="llama-3.1-8b-instant",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "What is the purpose of life?"},
+            {"role": "user", "content": "say hello to Denis haha"},
         ],
         max_tokens=600,
         stream=is_streaming,

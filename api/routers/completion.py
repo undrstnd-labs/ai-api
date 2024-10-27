@@ -36,8 +36,8 @@ async def chat_completions(
         if request.messages:
             request_data = requests_db.create_request(
                 user_id=api_token["userId"],
-                parameters=request.dict(),
-                request=request.dict(),
+                parameters=request.model_dump(),
+                request=request.model_dump(),
                 response="PENDING: Request in progress.",
                 endpoint="/v1/chat/completions",
             )
@@ -45,7 +45,7 @@ async def chat_completions(
             if request.stream:
                 return StreamingResponse(
                     async_generator_chat_completion(
-                        model=model, client=client, request=request
+                        model=model, client=client, request=request, api_token=api_token
                     ),
                     media_type="application/x-ndjson",
                 )
