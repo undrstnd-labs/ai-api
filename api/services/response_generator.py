@@ -10,6 +10,7 @@ from api.database.usage import Usage
 from api.models.request import ChatCompletionRequest, CompletionRequest
 from api.models.type import Model, Request
 from api.services.models import ModelService
+from api.utils.label import clean_label
 
 usage_db = Usage()
 funding_db = Fundings()
@@ -41,7 +42,7 @@ async def stream_chat_completion(
 
     token_used = 0
     for chunk in response:
-        chunk_data = chunk.to_dict()
+        chunk_data = clean_label(chunk.to_dict())
         token_used += 1
         yield f"data: {json.dumps(chunk_data)}\n\n"
         await asyncio.sleep(0.01)
@@ -100,7 +101,7 @@ async def stream_completion(
 
     token_used = 0
     for chunk in response:
-        chunk_data = chunk.to_dict()
+        chunk_data = clean_label(chunk.to_dict())
         token_used += 1
         yield f"data: {json.dumps(chunk_data)}\n\n"
         await asyncio.sleep(0.01)
@@ -158,6 +159,7 @@ def generate_chat_completion(
     )
 
     token_used = response.usage.total_tokens
+    response = clean_label(response.to_dict())
     consumption = token_used * (model_service.get_model_pricing(model) / 1000000)
 
     funding = funding_db.get_funding(user_id=api_token["userId"])
@@ -212,6 +214,7 @@ def generate_completion(
     )
 
     token_used = response.usage.total_tokens
+    response = clean_label(response.to_dict())
     consumption = token_used * (model_service.get_model_pricing(model) / 1000000)
 
     funding = funding_db.get_funding(user_id=api_token["userId"])

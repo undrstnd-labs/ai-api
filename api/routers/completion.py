@@ -35,7 +35,6 @@ async def chat_completions(
         model, api_key, base_url = await get_api_token_model_inference(
             api_token, request.model
         )
-        print(model, api_key, base_url)
 
         client = OpenAI(api_key=api_key, base_url=base_url)
 
