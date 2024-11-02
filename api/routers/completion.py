@@ -13,6 +13,7 @@ from api.services.async_generator import (
     async_generator_chat_completion,
     async_generator_completion,
 )
+from api.services.models import ModelService
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ router = APIRouter()
 usage_db = Usage()
 funding_db = Fundings()
 requests_db = Requests()
+model_service = ModelService()
 
 
 @router.post("/v1/chat/completions", dependencies=[Depends(retrieve_api_key)])
@@ -66,13 +68,16 @@ async def chat_completions(
                     user=request.user,
                     stream=False,
                 )
-                token_used = response.usage.total_tokens
-                consumption = token_used * (model.pricing / 1000000)
 
-                funding = await funding_db.get_funding(user_id=api_token.userId)
-                if not funding or funding.amount <= 0:
+                token_used = response.usage.total_tokens
+                consumption = token_used * (
+                    model_service.get_model_pricing(model) / 1000000
+                )
+
+                funding = funding_db.get_funding(user_id=api_token["userId"])
+                if not funding or funding["amount"] <= 0:
                     requests_db.update_request(
-                        request_id=request_data["id"],
+                        request_id=request_data.data[0]["id"],
                         status="FAILED",
                         response="ERROR: Insufficient balance.",
                     )
@@ -80,22 +85,21 @@ async def chat_completions(
                         status_code=402, detail="Insufficient balance."
                     )
 
-                await funding_db.update_funding(
-                    user_id=api_token.userId,
-                    amount=funding.amount - consumption,
-                    currency=funding.currency,
+                funding_db.update_funding(
+                    user_id=api_token["userId"],
+                    amount=funding["amount"] - consumption,
+                    currency=funding["currency"],
                 )
 
-                await usage_db.create_usage(
-                    user_id=api_token.userId,
+                usage_db.create_usage(
+                    user_id=api_token["userId"],
                     tokens_used=token_used,
                     cost=consumption,
                 )
 
-                await requests_db.update_request(
-                    request_id=request_data["id"],
+                requests_db.update_request(
+                    request_id=request_data.data[0]["id"],
                     status="SUCCESS",
-                    response=response.choices[0].message.content,
                 )
 
                 return response
