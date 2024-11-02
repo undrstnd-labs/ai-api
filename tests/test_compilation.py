@@ -14,7 +14,7 @@ def main():
         production_url if os.environ.get("ENV") == "production" else development_url
     )
 
-    is_streaming = False
+    is_streaming = True
 
     client = OpenAI(api_key="udsk_demo-api-key-x-00000", base_url=base_url)
 

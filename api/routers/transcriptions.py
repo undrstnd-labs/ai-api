@@ -6,10 +6,7 @@ from starlette.responses import StreamingResponse
 
 from api.models.request import AudioTranscriptions, AudioTranslations
 from api.services.api_key import get_api_token_model_inference, retrieve_api_key
-from api.services.async_generator import (
-    async_generator_chat_completion,
-    async_generator_completion,
-)
+from api.services.response_generator import stream_chat_completion, stream_completion
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +27,7 @@ async def chat_completions(
         if request.messages:
             if request.stream:
                 return StreamingResponse(
-                    async_generator_chat_completion(
-                        model=model, client=client, request=request
-                    ),
+                    stream_chat_completion(model=model, client=client, request=request),
                     media_type="application/x-ndjson",
                 )
             else:
@@ -72,9 +67,7 @@ async def completions(request: AudioTranslations, api_token=Depends(retrieve_api
         if request.prompt:
             if request.stream:
                 return StreamingResponse(
-                    async_generator_completion(
-                        model=model, client=client, request=request
-                    ),
+                    stream_completion(model=model, client=client, request=request),
                     media_type="application/x-ndjson",
                 )
             else:

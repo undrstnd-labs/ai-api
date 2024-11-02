@@ -1,3 +1,4 @@
+import json
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,11 +10,13 @@ from api.database.requests import Requests
 from api.database.usage import Usage
 from api.models.request import ChatCompletionRequest, CompletionRequest
 from api.services.api_key import get_api_token_model_inference, retrieve_api_key
-from api.services.async_generator import (
-    async_generator_chat_completion,
-    async_generator_completion,
-)
 from api.services.models import ModelService
+from api.services.response_generator import (
+    generate_chat_completion,
+    generate_completion,
+    stream_chat_completion,
+    stream_completion,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -46,63 +49,23 @@ async def chat_completions(
 
             if request.stream:
                 return StreamingResponse(
-                    async_generator_chat_completion(
-                        model=model, client=client, request=request, api_token=api_token
+                    stream_chat_completion(
+                        model=model,
+                        client=client,
+                        request=request,
+                        api_token=api_token,
+                        request_data=request_data,
                     ),
                     media_type="application/x-ndjson",
                 )
             else:
-                response = client.chat.completions.create(
+                return generate_chat_completion(
                     model=model,
-                    messages=[
-                        {"role": m.role, "content": m.content} for m in request.messages
-                    ],
-                    max_tokens=request.max_tokens,
-                    temperature=request.temperature,
-                    top_p=request.top_p,
-                    frequency_penalty=request.frequency_penalty,
-                    presence_penalty=request.presence_penalty,
-                    stop=request.stop,
-                    n=request.n,
-                    logprobs=request.logprobs,
-                    user=request.user,
-                    stream=False,
+                    client=client,
+                    request=request,
+                    api_token=api_token,
+                    request_data=request_data,
                 )
-
-                token_used = response.usage.total_tokens
-                consumption = token_used * (
-                    model_service.get_model_pricing(model) / 1000000
-                )
-
-                funding = funding_db.get_funding(user_id=api_token["userId"])
-                if not funding or funding["amount"] <= 0:
-                    requests_db.update_request(
-                        request_id=request_data.data[0]["id"],
-                        status="FAILED",
-                        response="ERROR: Insufficient balance.",
-                    )
-                    return HTTPException(
-                        status_code=402, detail="Insufficient balance."
-                    )
-
-                funding_db.update_funding(
-                    user_id=api_token["userId"],
-                    amount=funding["amount"] - consumption,
-                    currency=funding["currency"],
-                )
-
-                usage_db.create_usage(
-                    user_id=api_token["userId"],
-                    tokens_used=token_used,
-                    cost=consumption,
-                )
-
-                requests_db.update_request(
-                    request_id=request_data.data[0]["id"],
-                    status="SUCCESS",
-                )
-
-                return response
         else:
             return HTTPException(status_code=400, detail="ERROR: No messages provided")
     except Exception as e:
@@ -122,33 +85,17 @@ async def completions(request: CompletionRequest, api_token=Depends(retrieve_api
         if request.prompt:
             if request.stream:
                 return StreamingResponse(
-                    async_generator_completion(
-                        model=model, client=client, request=request
-                    ),
+                    stream_completion(model=model, client=client, request=request),
                     media_type="application/x-ndjson",
                 )
             else:
-                response = client.completions.create(
+                return generate_completion(
+                    client=client,
                     model=model,
-                    messages=[
-                        {"role": "system", "content": request.prompt},
-                        *[
-                            {"role": m.role, "content": m.content}
-                            for m in request.messages
-                        ],
-                    ],
-                    max_tokens=request.max_tokens,
-                    temperature=request.temperature,
-                    top_p=request.top_p,
-                    frequency_penalty=request.frequency_penalty,
-                    presence_penalty=request.presence_penalty,
-                    stop=request.stop,
-                    n=request.n,
-                    logprobs=request.logprobs,
-                    user=request.user,
-                    stream=False,
+                    request=request,
+                    api_token=api_token,
+                    request_data=request,
                 )
-                return response
         else:
             return HTTPException(status_code=400, detail="ERROR: No prompt provided")
     except Exception as e:

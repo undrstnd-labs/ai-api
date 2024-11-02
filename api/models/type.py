@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -22,3 +23,20 @@ class TokenModelInference(BaseModel):
     model: Model
     inference: str
     token: str
+
+
+class StatusEnum(str, Enum):
+    FAILED = "FAILED"
+    PENDING = "PENDING"
+    SUCCESS = "SUCCESS"
+
+
+class Request(BaseModel):
+    id: str
+    status: StatusEnum
+    parameters: dict
+    request: dict
+    response: str
+    endpoint: str
+    user_id: str
+    apiTokenId: str
