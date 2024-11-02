@@ -35,6 +35,7 @@ async def chat_completions(
         model, api_key, base_url = await get_api_token_model_inference(
             api_token, request.model
         )
+        print(model, api_key, base_url)
 
         client = OpenAI(api_key=api_key, base_url=base_url)
 
@@ -67,10 +68,9 @@ async def chat_completions(
                     request_data=request_data,
                 )
         else:
-            return HTTPException(status_code=400, detail="ERROR: No messages provided")
+            raise HTTPException(status_code=400, detail="ERROR: No messages provided")
     except Exception as e:
-        logger.error(f"Error in chat_completions: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail=f"Internal server error - {e}")
 
 
 @router.post("/v1/completions", dependencies=[Depends(retrieve_api_key)])
@@ -97,8 +97,6 @@ async def completions(request: CompletionRequest, api_token=Depends(retrieve_api
                     request_data=request,
                 )
         else:
-            return HTTPException(status_code=400, detail="ERROR: No prompt provided")
+            raise HTTPException(status_code=400, detail="ERROR: No prompt provided")
     except Exception as e:
-        logger.error(f"Error in completions: {e}")
-        print(e)
         raise HTTPException(status_code=500, detail="Internal server error")

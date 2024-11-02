@@ -31,7 +31,7 @@ def main():
         )
     else:
         chat_completion = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama-3.1-8b-ieenstant",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": "What is the capital of France?"},

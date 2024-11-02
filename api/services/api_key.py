@@ -8,6 +8,9 @@ from api.models.inference import InferenceBaseUrl, InferenceType
 from api.models.type import Model
 from api.services.models import ModelService
 
+api_tokens = ApiTokens()
+model_service = ModelService()
+
 
 async def retrieve_api_key(
     api_key_header: str = Depends(APIKeyHeader(name="Authorization", auto_error=False))
@@ -24,13 +27,10 @@ async def retrieve_api_key(
     """
 
     if api_key_header is None:
-        print("API key is missing")
         raise HTTPException(status_code=403, detail="ERROR: API key is missing")
-    api_tokens = ApiTokens()
     api_token = api_tokens.get_api_key(api_key_header.split(" ")[1])
 
     if api_token is None:
-        print(f"Invalid API key: {api_key_header}")
         raise HTTPException(status_code=403, detail="ERROR: Invalid API token.")
 
     return api_token
@@ -48,10 +48,9 @@ async def get_api_token_model_inference(api_key, model: str) -> Tuple[Model, str
     :return: A tuple containing the model object, inference type, and token.
     :rtype: Tuple[Model, InferenceType, str]
     """
-    model_service = ModelService()
     if model_service.get_model(model) is None:
-        print(f"Model not found: {model}")
         raise HTTPException(status_code=404, detail="ERROR: Model not found.")
+
     if model_service.get_model_inference(model) == InferenceType.GR_LPU.value:
         return (
             model_service.get_model_id(model),
