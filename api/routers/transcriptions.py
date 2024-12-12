@@ -96,5 +96,4 @@ async def completions(request: AudioTranslations, api_token=Depends(retrieve_api
             return HTTPException(status_code=400, detail="ERROR: No prompt provided")
     except Exception as e:
         logger.error(f"Error in completions: {e}")
-        print(e)
         raise HTTPException(status_code=500, detail="Internal server error")

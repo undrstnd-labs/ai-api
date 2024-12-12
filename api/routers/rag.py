@@ -17,7 +17,6 @@ router = APIRouter()
 async def rag_chat_completions(
     request: ChatRequestRAG, api_token=Depends(retrieve_api_key)
 ):
-    print(request)
     try:
         model, api_key, base_url = await get_api_token_model_inference(
             api_token, request.model
@@ -101,5 +100,4 @@ async def rag_completions(
             return HTTPException(status_code=400, detail="ERROR: No prompt provided")
     except Exception as e:
         logger.error(f"Error in completions: {e}")
-        print(e)
         raise HTTPException(status_code=500, detail="Internal server error")

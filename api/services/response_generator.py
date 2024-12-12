@@ -45,7 +45,6 @@ async def stream_chat_completion(
         chunk_data = clean_label(chunk.to_dict())
         token_used += 1
         yield f"data: {json.dumps(chunk_data)}\n\n"
-        await asyncio.sleep(0.01)
 
     consumption = token_used * (model_service.get_model_pricing(model) / 1000000)
     funding = funding_db.get_funding(user_id=api_token["userId"])

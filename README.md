@@ -113,7 +113,7 @@ For more information about the project, you can visit our website at [Undrstnd L
 To run the tests, use the following command:
 
 ```sh
-sh test.sh
+sh tests/comp.sh
 ```
 
 This will execute the test suite located in the tests directory.

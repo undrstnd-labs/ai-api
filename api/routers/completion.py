@@ -1,4 +1,3 @@
-import json
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -10,6 +9,7 @@ from api.database.requests import Requests
 from api.database.usage import Usage
 from api.models.request import ChatCompletionRequest, CompletionRequest
 from api.services.api_key import get_api_token_model_inference, retrieve_api_key
+from api.services.client import ClientService
 from api.services.models import ModelService
 from api.services.response_generator import (
     generate_chat_completion,
@@ -32,12 +32,8 @@ async def chat_completions(
     request: ChatCompletionRequest, api_token=Depends(retrieve_api_key)
 ):
     try:
-        model, api_key, base_url = await get_api_token_model_inference(
-            api_token, request.model
-        )
-
-        client = OpenAI(api_key=api_key, base_url=base_url)
-
+        client_service = ClientService(api_token=api_token, model=request.model)
+        client, model = await client_service.create_client()
         if request.messages:
             request_data = requests_db.create_request(
                 user_id=api_token["userId"],
@@ -46,7 +42,6 @@ async def chat_completions(
                 response="PENDING: Request in progress.",
                 endpoint="/v1/chat/completions",
             )
-
             if request.stream:
                 return StreamingResponse(
                     stream_chat_completion(

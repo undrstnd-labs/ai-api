@@ -36,7 +36,9 @@ async def retrieve_api_key(
     return api_token
 
 
-async def get_api_token_model_inference(api_key, model: str) -> Tuple[Model, str, str]:
+async def get_api_token_model_inference(
+    api_key, model: str
+) -> Tuple[Model, str, str]:
     """
     Retrieve the model object, inference type,
     and token based on the model name.
@@ -72,4 +74,10 @@ async def get_api_token_model_inference(api_key, model: str) -> Tuple[Model, str
             InferenceBaseUrl.SM_RDU.value,
         )
 
+    elif model_service.get_model_inference(model) == InferenceType.AZ_INF.value:
+        return (
+            model_service.get_model_id(model),
+            api_key["tokenAz"],
+            InferenceBaseUrl.AZ_INF.value,
+        )
     raise HTTPException(status_code=400, detail="ERROR: Inference type not found.")

@@ -260,6 +260,19 @@
       "inference": "cr-inf"
     },
     {
+      "id": "llama-3.3-70b",
+      "active": true,
+      "name": "Llama 3.3 70B",
+      "description": "Llama 3.3 is a version of the Llama model developed by Meta. This 70B parameter version of Llama 3.3 is optimized for a variety of tasks.",
+      "developer": "@meta-llama",
+      "provider": "HuggingFace",
+      "source": "https://huggingface.co/meta-llama/Meta-Llama-3.3-70B",
+      "tags": ["llama", "3.3", "70b"],
+      "maxContextWindow": 8192,
+      "pricing": 2.054,
+      "inference": "cr-inf"
+    },
+    {
       "id": "Meta-Llama-3.1-8B-Instruct",
       "active": true,
       "name": "Meta Llama 3 8B",
