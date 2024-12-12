@@ -1,6 +1,7 @@
 import enum
 import json
 import os
+import datetime
 from typing import List, Optional
 
 from api.models.type import Model
@@ -117,7 +118,7 @@ class ModelService:
                     {
                         "id": model.id,
                         "object": "model",
-                        "created": model.created,
+                        "created": datetime.datetime.now().isoformat(),
                         "owned_by": model.developer,
                     }
                 ],
