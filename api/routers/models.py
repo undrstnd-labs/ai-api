@@ -7,7 +7,7 @@ router = APIRouter()
 model_service = ModelService()
 
 
-@router.post("/v1/models", dependencies=[Depends(retrieve_api_key)])
+@router.get("/v1/models", dependencies=[Depends(retrieve_api_key)])
 async def get_models():
     """
     Retrieve the list of models available for completion.
