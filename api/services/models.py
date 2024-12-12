@@ -107,3 +107,19 @@ class ModelService:
 
     def get_model_names(self) -> List[str]:
         return [model.name for model in self.models]
+
+    def get_model_info(self, model_id: str) -> Optional[dict]:
+        model = self.get_model(model_id)
+        if model is not None:
+            return {
+                "object": "list",
+                "data": [
+                    {
+                        "id": model.id,
+                        "object": "model",
+                        "created": model.created,
+                        "owned_by": model.developer,
+                    }
+                ],
+            }
+        return None
